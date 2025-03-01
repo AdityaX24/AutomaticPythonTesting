@@ -1,0 +1,6 @@
+{
+    "test_type": "stdin",  
+    "timeout": 10,
+    "output_comparison": "exact",  
+    "weight": 1.5          
+}
