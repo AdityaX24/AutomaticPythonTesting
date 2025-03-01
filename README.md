@@ -16,27 +16,27 @@ A Python-based testing framework to automatically test and score Python scripts 
 ---
 
 ## Project Structure
-root/
-├── questions/ # Folder containing question categories
-│ ├── Q1/ # Question 1
-│ │ ├── tests/ # Test cases for Q1
-│ │ │ ├── test_1_input.txt
-│ │ │ └── test_1_output.txt
-│ │ └── config.json # Configuration for Q1
-│ ├── Q2/ # Question 2 (argument-based)
-│ │ ├── tests/
-│ │ │ ├── test_1_args.txt
-│ │ │ └── test_1_output.txt
-│ │ └── config.json
-├── scripts/ # Folder containing Python scripts to test
-│ ├── Q1_script.py # Scripts follow naming convention
-│ └── Q2_script.py
-├── tester.py # Main testing script
-├── results.csv # Output results (auto-generated)
-├── requirements.txt # Python dependencies
-└── README.md # This file
-
-
+root/  
+├── questions/ # Folder containing question categories  
+│ ├── Q1/ # Question 1  
+│ │ ├── tests/ # Test cases for Q1  
+│ │ │ ├── test_1_input.txt  
+│ │ │ └── test_1_output.txt  
+│ │ └── config.json # Configuration for Q1   
+│ ├── Q2/ # Question 2 (argument-based)  
+│ │ ├── tests/  
+│ │ │ ├── test_1_args.txt  
+│ │ │ └── test_1_output.txt  
+│ │ └── config.json  
+├── scripts/ # Folder containing Python scripts to test  
+│ ├── Q1_script.py # Scripts follow naming convention  
+│ └── Q2_script.py  
+├── tester.py # Main testing script  
+├── results.csv # Output results (auto-generated)  
+├── requirements.txt # Python dependencies  
+└── README.md # This file  
+  
+  
 ---
 
 ## Setup
