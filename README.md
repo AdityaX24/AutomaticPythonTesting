@@ -45,11 +45,16 @@ root
    ```bash
    git clone https://github.com/your-username/python-script-tester.git
    cd python-script-tester
+   ```
 2. **Create a Virtual Environment**:
+    ```bash
     python3 -m venv .venv
     source .venv/bin/activate  # On Windows, use `.venv\Scripts\activate`
+    ```
 3. **Install Dependencies**:
+    ```bash
     pip install -r requirements.txt
+    ```
 4. **Organize Your Files**:
     Place your Python scripts in the scripts/ folder. Name them as Q1_script.py, Q2_script.py, etc.
     Add questions and test cases in the questions/ folder. Each question should have:
@@ -60,10 +65,12 @@ root
 **Configuration**
 Each question folder must contain a config.json file with the following fields:
 
+```bash
 {
   "test_type": "stdin",       // or "args" for command-line arguments
   "timeout": 5,               // Maximum execution time (seconds)
   "output_comparison": "exact", // or "fuzzy", "image"
   "weight": 1.5               // Scoring weight for this question
 }
+```
 
