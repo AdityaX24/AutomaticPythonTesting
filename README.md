@@ -16,7 +16,8 @@ A Python-based testing framework to automatically test and score Python scripts 
 ---
 
 ## Project Structure
-root 
+```bash
+root  
 ├── questions/ # Folder containing question categories  
 │ ├── Q1/ # Question 1  
 │ │ ├── tests/ # Test cases for Q1  
@@ -36,8 +37,7 @@ root
 ├── requirements.txt # Python dependencies  
 └── README.md # This file  
   
-  
----
+```
 
 ## Setup
 
