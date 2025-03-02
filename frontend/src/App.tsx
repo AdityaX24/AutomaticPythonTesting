@@ -2,7 +2,7 @@ import { FileManager } from "./components/FileManager";
 import { ScriptUpload } from "./components/ScriptUpload";
 import { TestCaseUpload } from "./components/TestCaseUpload";
 import { TestControls } from "./components/TestControls";
-import { ResultsDisplay } from "./components/ResultsDisplay";
+// import { ResultsDisplay } from "./components/ResultsDisplay";
 import "./App.css";
 
 export const App = () => {
