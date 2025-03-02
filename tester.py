@@ -4,17 +4,21 @@ import subprocess
 from PIL import Image  # For image comparisons
 import numpy as np
 import sys
+from pathlib import Path
+
+BASE_DIR = Path(__file__).parent.parent
 
 def load_questions(questions_dir):
     """Load all questions with their configurations and test cases"""
+    questions_path = BASE_DIR / "AutomaticPythonTesting" / questions_dir
     questions = {}
     # List only directories and ignore hidden files
-    question_dirs = [d for d in os.listdir(questions_dir)
-                    if os.path.isdir(os.path.join(questions_dir, d))
+    question_dirs = [d for d in os.listdir(questions_path)
+                    if os.path.isdir(os.path.join(questions_path, d))
                     and not d.startswith('.')]  # Skip hidden directories
     print(question_dirs)
     for q_dir in question_dirs:
-        q_path = os.path.join(questions_dir, q_dir)
+        q_path = os.path.join(questions_path, q_dir)
         config_path = os.path.join(q_path, 'config.json')
         
         print(config_path)
@@ -118,7 +122,9 @@ def compare_outputs(actual, expected, comparison_type):
 
 def main():
     questions = load_questions('questions')
-    scripts = [f for f in os.listdir('scripts') if f.endswith('.py')]
+
+    scripts_path = BASE_DIR / "AutomaticPythonTesting" / 'scripts'
+    scripts = [f for f in os.listdir(scripts_path) if f.endswith('.py')]
     
     print(questions)
     results = []

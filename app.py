@@ -25,7 +25,7 @@ BASE_DIR = Path(__file__).parent.parent
 
 @app.post("/upload/script")
 async def upload_script(file: UploadFile = File(...)):
-    script_dir = BASE_DIR / "scripts"
+    script_dir = BASE_DIR / "AutomaticPythonTesting" / "scripts"
     script_dir.mkdir(exist_ok=True)
     
     file_path = script_dir / file.filename
@@ -39,7 +39,7 @@ async def upload_testcase(
     test_type: str = Form(...),
     file: UploadFile = File(...)
 ):
-    test_dir = BASE_DIR / "questions" / question_id / "tests"
+    test_dir = BASE_DIR / "AutomaticPythonTesting" / "questions" / question_id / "tests"
     test_dir.mkdir(parents=True, exist_ok=True)
     
     filename = f"test_{len(os.listdir(test_dir)) + 1}_{test_type}.txt"
@@ -55,7 +55,7 @@ async def upload_testcase(
 async def delete_item(data: dict = Body(...)):  # Accept path from the body
     path = data.get("path")
     print(path)
-    full_path = BASE_DIR / path
+    full_path = BASE_DIR / "AutomaticPythonTesting" / path
     if not full_path.exists():
         raise HTTPException(status_code=404, detail="Path not found")
     
@@ -70,7 +70,7 @@ async def delete_item(data: dict = Body(...)):  # Accept path from the body
 async def delete_item(data: dict = Body(...)):  # Accept path from the body
     path = data.get("path")
     print(path)
-    full_path = BASE_DIR / path
+    full_path = BASE_DIR / "AutomaticPythonTesting" / path
     if not full_path.exists():
         raise HTTPException(status_code=404, detail="Path not found")
     
@@ -104,9 +104,13 @@ async def run_tests(background_tasks: BackgroundTasks):
 
 @app.get("/list-files")
 async def list_files():
-    scripts = [f for f in os.listdir(BASE_DIR / "AutomaticPythonTesting" / "scripts") if not f.startswith('.')]
-    questions = [f for f in os.listdir(BASE_DIR / "AutomaticPythonTesting" / "questions") if not f.startswith('.')]
+    # scripts = [f for f in os.listdir(BASE_DIR / "AutomaticPythonTesting" / "scripts") if not f.startswith('.')]
+    # questions = [f for f in os.listdir(BASE_DIR / "AutomaticPythonTesting" / "questions") if not f.startswith('.')]
     
+    scripts = [f for f in os.listdir(BASE_DIR / "AutomaticPythonTesting" / "scripts") if not f.startswith('.')]
+    questions = [f for f in os.listdir(BASE_DIR  / "AutomaticPythonTesting" / "questions") if not f.startswith('.')]
+    
+
     return {
         "scripts": scripts,
         "questions": questions
