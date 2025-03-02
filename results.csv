@@ -1,7 +1,7 @@
 Question,Script,Test,Status,Score
-Q2,Q2_Poddar_script.py,Test_1,Passed,1.5
-Q2,Q2_Poddar_script.py,Test_2,Passed,1.5
-Q2,Q2_Poddar_script.py,Test_3,Passed,1.5
-Q1,Q1_Aditya_script.py,Test_1,Passed,1.5
-Q1,Q1_Aditya_script.py,Test_2,Passed,1.5
-Q1,Q1_Aditya_script.py,Test_3,Passed,1.5
+Q2,Q2_Poddar_script.py,Test_1,Passed,100.0
+Q2,Q2_Poddar_script.py,Test_2,Passed,100.0
+Q2,Q2_Poddar_script.py,Test_3,Passed,100.0
+Q1,Q1_Aditya_script.py,Test_1,Passed,100.0
+Q1,Q1_Aditya_script.py,Test_2,Passed,100.0
+Q1,Q1_Aditya_script.py,Test_3,Passed,100.0

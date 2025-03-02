@@ -1,0 +1,168 @@
+.results-card {
+  background: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin-bottom: 2rem;
+}
+
+.card-header {
+  padding: 1.5rem;
+  background-color: #6a89a7;
+  color: white;
+  font-size: 1.25rem;
+  border-radius: 8px 8px 0 0;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  position: relative;
+}
+
+.header-icon {
+  font-size: 1.5rem;
+}
+
+.last-updated {
+  position: absolute;
+  right: 1.5rem;
+  font-size: 0.9rem;
+  opacity: 0.8;
+}
+
+.results-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1rem 0;
+}
+
+.results-table th {
+  padding: 1.2rem;
+  background-color: #f8f9fa;
+  font-weight: 600;
+  color: #2c3e50;
+  text-align: left;
+  border-bottom: 2px solid #e2e8f0;
+}
+
+.results-table td {
+  padding: 1rem;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.column-icon {
+  margin-right: 0.5rem;
+  vertical-align: middle;
+}
+
+.result-row:hover {
+  background-color: #f8fafc;
+}
+
+.status-container {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.status-icon {
+  font-size: 1.2rem;
+}
+
+.status-icon.pass {
+  color: #10b981;
+}
+
+.status-icon.fail {
+  color: #ef4444;
+}
+
+.status-icon.pending {
+  color: #f59e0b;
+}
+
+.status-text {
+  text-transform: uppercase;
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+
+.status-text.pass {
+  color: #10b981;
+}
+
+.status-text.fail {
+  color: #ef4444;
+}
+
+.status-text.pending {
+  color: #f59e0b;
+}
+
+.score-container {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.score-value {
+  font-weight: 600;
+  color: #3b82f6;
+  min-width: 50px;
+}
+
+.score-bar {
+  width: 100px;
+  height: 8px;
+  background-color: #e2e8f0;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.score-progress {
+  height: 100%;
+  background-color: #3b82f6;
+  transition: width 0.3s ease;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 3rem;
+  color: #64748b;
+}
+
+.empty-icon {
+  font-size: 3rem;
+  color: #cbd5e1;
+  margin-bottom: 1rem;
+}
+
+.empty-state p {
+  font-size: 1.1rem;
+  margin-bottom: 0.5rem;
+}
+
+.empty-state small {
+  font-size: 0.9rem;
+  color: #94a3b8;
+}
+
+@media (max-width: 768px) {
+  .card-header {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 1rem;
+  }
+
+  .last-updated {
+    position: static;
+    margin-top: 0.5rem;
+    font-size: 0.8rem;
+  }
+
+  .results-table {
+    min-width: 700px;
+  }
+
+  .table-responsive {
+    overflow-x: auto;
+  }
+}

@@ -1,0 +1,122 @@
+.file-manager-card {
+  background: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin-bottom: 2rem;
+}
+
+.card-header {
+  padding: 1.5rem;
+  background-color: #6a89a7;
+  color: white;
+  font-size: 1.25rem;
+  border-radius: 8px 8px 0 0;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.header-icon {
+  font-size: 1.5rem;
+}
+
+.card-body {
+  padding: 2rem;
+}
+
+.table-section {
+  margin-bottom: 2.5rem;
+}
+
+.table-section:last-child {
+  margin-bottom: 0;
+}
+
+.table-title {
+  color: #2c3e50;
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.title-icon {
+  color: #6a89a7;
+}
+
+.file-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 1rem;
+}
+
+.file-table th,
+.file-table td {
+  padding: 1rem;
+  text-align: left;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.file-table th {
+  background-color: #f8f9fa;
+  font-weight: 600;
+  color: #4a5568;
+}
+
+.file-table tr:hover {
+  background-color: #f8fafc;
+}
+
+.delete-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background-color: #fee2e2;
+  color: #dc2626;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.delete-btn:hover {
+  background-color: #fecaca;
+}
+
+.delete-btn span {
+  font-weight: 500;
+}
+
+.empty-row td {
+  text-align: center;
+  color: #718096;
+  padding: 2rem;
+}
+
+.error-message {
+  padding: 1rem;
+  margin: 1rem;
+  background-color: #fee2e2;
+  color: #991b1b;
+  border-radius: 6px;
+}
+
+.loading-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: 2rem;
+  color: #4a5568;
+}
+
+.spin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
