@@ -1,28 +1,28 @@
-import { FileManager } from "./components/FileManager";
+import React from "react";
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import { Sidebar } from "./components/Sidebar";
 import { ScriptUpload } from "./components/ScriptUpload";
 import { TestCaseUpload } from "./components/TestCaseUpload";
+import { FileManager } from "./components/FileManager";
 import { TestControls } from "./components/TestControls";
-// import { ResultsDisplay } from "./components/ResultsDisplay";
 import "./App.css";
 
 export const App = () => {
   return (
-    <div className="container mt-5">
-      <h1 className="mb-4">Script Tester Dashboard</h1>
-
-      <div className="card mb-4">
-        <div className="card-header">Upload Files</div>
-        <div className="card-body">
-          <div className="row">
-            <ScriptUpload />
-            <TestCaseUpload />
-          </div>
+    <Router>
+      <div className="app-container">
+        <Sidebar />
+        <div className="main-content">
+          <h1 className="mb-4">Script Tester Dashboard</h1>
+          <Routes>
+            <Route path="/upload-script" element={<ScriptUpload />} />
+            <Route path="/upload-testcase" element={<TestCaseUpload />} />
+            <Route path="/delete-files" element={<FileManager />} />
+            <Route path="/run-script" element={<TestControls />} />
+            <Route path="/" element={<ScriptUpload />} /> {/* Default route */}
+          </Routes>
         </div>
       </div>
-
-      <FileManager />
-      <TestControls />
-      {/* <ResultsDisplay /> */}
-    </div>
+    </Router>
   );
 };
