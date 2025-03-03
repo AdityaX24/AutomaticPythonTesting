@@ -1,0 +1,6 @@
+The matrix is not singular.
+Inverse of the matrix: 
+[[-0.38 -0.1   0.18]
+ [-0.15 -0.03  0.08]
+ [ 0.08  0.03 -0.02]
+ [ 0.31  0.1  -0.11]]
