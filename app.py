@@ -7,6 +7,7 @@ import subprocess
 from typing import List
 from pathlib import Path
 import logging
+import json
 
 logger = logging.getLogger("my_logger")
 
@@ -36,20 +37,58 @@ async def upload_script(file: UploadFile = File(...)):
 @app.post("/upload/testcase")
 async def upload_testcase(
     question_id: str = Form(...),
-    test_type: str = Form(...),
-    file: UploadFile = File(...)
+    input_file: UploadFile = File(...),
+    output_file: UploadFile = File(...)
 ):
     test_dir = BASE_DIR / "AutomaticPythonTesting" / "questions" / question_id / "tests"
     test_dir.mkdir(parents=True, exist_ok=True)
-    
-    filename = f"test_{len(os.listdir(test_dir)) + 1}_{test_type}.txt"
-    file_path = test_dir / filename
-    
-    with open(file_path, "wb") as buffer:
-        shutil.copyfileobj(file.file, buffer)
-    
-    return {"message": f"Test case {filename} uploaded"}
 
+    # Create/check config file in question directory
+    question_dir = test_dir.parent
+    config_path = question_dir / "config.json"
+    
+    if not config_path.exists():
+        default_config = {
+            "test_type": "stdin",
+            "timeout": 10,
+            "output_comparison": "exact",
+            "weight": 100
+        }
+        try:
+            with open(config_path, 'w') as config_file:
+                json.dump(default_config, config_file, indent=4)
+        except Exception as e:
+            raise HTTPException(
+                status_code=500,
+                detail=f"Failed to create config file: {str(e)}"
+            )
+        
+    # Get existing test numbers
+    existing_files = os.listdir(test_dir)
+    test_numbers = []
+    for filename in existing_files:
+        if filename.startswith("test_") and (filename.endswith("_input.txt") or filename.endswith("_output.txt")):
+            parts = filename.split('_')
+            if len(parts) >= 3:
+                try:
+                    test_numbers.append(int(parts[1]))
+                except ValueError:
+                    continue
+    new_test_number = max(test_numbers) + 1 if test_numbers else 1
+
+    # Save input file
+    input_filename = f"test_{new_test_number}_input.txt"
+    input_path = test_dir / input_filename
+    with open(input_path, "wb") as buffer:
+        shutil.copyfileobj(input_file.file, buffer)
+    
+    # Save output file
+    output_filename = f"test_{new_test_number}_output.txt"
+    output_path = test_dir / output_filename
+    with open(output_path, "wb") as buffer:
+        shutil.copyfileobj(output_file.file, buffer)
+    
+    return {"message": f"Test case {new_test_number} uploaded successfully"}
 
 @app.post("/delete-scripts")
 async def delete_item(data: dict = Body(...)):  # Accept path from the body
@@ -67,19 +106,24 @@ async def delete_item(data: dict = Body(...)):  # Accept path from the body
     return {"message": f"{path} deleted"}
 
 @app.post("/delete-testcases")
-async def delete_item(data: dict = Body(...)):  # Accept path from the body
+async def delete_item(data: dict = Body(...)):
     path = data.get("path")
-    print(path)
     full_path = BASE_DIR / "AutomaticPythonTesting" / path
+    
     if not full_path.exists():
         raise HTTPException(status_code=404, detail="Path not found")
     
-    if full_path.is_file():
-        full_path.unlink()
-    else:
-        shutil.rmtree(full_path)
-    
-    return {"message": f"{path} deleted"}
+    try:
+        if full_path.is_file():
+            full_path.unlink()
+        else:
+            shutil.rmtree(full_path)
+        return {"message": f"{path} deleted"}
+    except Exception as e:
+        raise HTTPException(
+            status_code=500, 
+            detail=f"Delete failed: {str(e)}"
+        )
 
 @app.get("/run-tests")
 async def run_tests(background_tasks: BackgroundTasks):
@@ -104,14 +148,24 @@ async def run_tests(background_tasks: BackgroundTasks):
 
 @app.get("/list-files")
 async def list_files():
-    # scripts = [f for f in os.listdir(BASE_DIR / "AutomaticPythonTesting" / "scripts") if not f.startswith('.')]
-    # questions = [f for f in os.listdir(BASE_DIR / "AutomaticPythonTesting" / "questions") if not f.startswith('.')]
+    base_path = BASE_DIR / "AutomaticPythonTesting"
+    scripts = [
+        f for f in os.listdir(base_path / "scripts") 
+        if not f.startswith('.')
+    ]
     
-    scripts = [f for f in os.listdir(BASE_DIR / "AutomaticPythonTesting" / "scripts") if not f.startswith('.')]
-    questions = [f for f in os.listdir(BASE_DIR  / "AutomaticPythonTesting" / "questions") if not f.startswith('.')]
+    questions = {}
+    questions_dir = base_path / "questions"
+    for q_dir in os.listdir(questions_dir):
+        if q_dir.startswith('.'):
+            continue
+        test_dir = questions_dir / q_dir / "tests"
+        if test_dir.exists():
+            questions[q_dir] = os.listdir(test_dir)
+        else:
+            questions[q_dir] = []
     
-
     return {
         "scripts": scripts,
-        "questions": questions
+        "questions": questions  # Now returns {question_id: [test_files]}
     }

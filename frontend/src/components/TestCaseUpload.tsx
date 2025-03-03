@@ -10,38 +10,42 @@ import "./TestCaseUpload.css";
 
 export const TestCaseUpload = () => {
   const [questionId, setQuestionId] = useState("");
-  const [testType, setTestType] = useState<"input" | "output" | "args">(
-    "input"
-  );
-  const [dragActive, setDragActive] = useState(false);
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [inputDragActive, setInputDragActive] = useState(false);
+  const [outputDragActive, setOutputDragActive] = useState(false);
+  const [inputFile, setInputFile] = useState<File | null>(null);
+  const [outputFile, setOutputFile] = useState<File | null>(null);
   const [uploadStatus, setUploadStatus] = useState<
     "idle" | "success" | "error"
   >("idle");
   const [uploadMessage, setUploadMessage] = useState("");
   const [isUploading, setIsUploading] = useState(false);
-  const fileInput = useRef<HTMLInputElement>(null);
+  const inputFileRef = useRef<HTMLInputElement>(null);
+  const outputFileRef = useRef<HTMLInputElement>(null);
 
-  const handleDrag = (e: React.DragEvent) => {
+  const handleDrag = (
+    e: React.DragEvent,
+    setDragActive: (active: boolean) => void
+  ) => {
     e.preventDefault();
     e.stopPropagation();
     setDragActive(e.type === "dragenter" || e.type === "dragover");
   };
 
-  const handleDrop = (e: React.DragEvent) => {
+  const handleDrop = (
+    e: React.DragEvent,
+    setDragActive: (active: boolean) => void,
+    setFile: (file: File | null) => void
+  ) => {
     e.preventDefault();
     e.stopPropagation();
     setDragActive(false);
     if (e.dataTransfer.files?.[0]) {
-      setSelectedFile(e.dataTransfer.files[0]);
-      if (fileInput.current) {
-        fileInput.current.files = e.dataTransfer.files;
-      }
+      setFile(e.dataTransfer.files[0]);
     }
   };
 
   const handleUpload = async () => {
-    if (!selectedFile || !questionId) return;
+    if (!inputFile || !outputFile || !questionId) return;
 
     setIsUploading(true);
     setUploadStatus("idle");
@@ -49,17 +53,18 @@ export const TestCaseUpload = () => {
 
     try {
       const formData = new FormData();
-      formData.append("file", selectedFile);
-      formData.append("type", "testcase");
       formData.append("question_id", questionId);
-      formData.append("test_type", testType);
+      formData.append("input_file", inputFile);
+      formData.append("output_file", outputFile);
 
       await uploadTestCase(formData);
       setUploadStatus("success");
-      setUploadMessage("Test case uploaded successfully!");
-      setSelectedFile(null);
+      setUploadMessage("Test cases uploaded successfully!");
+      setInputFile(null);
+      setOutputFile(null);
       setQuestionId("");
-      if (fileInput.current) fileInput.current.value = "";
+      if (inputFileRef.current) inputFileRef.current.value = "";
+      if (outputFileRef.current) outputFileRef.current.value = "";
     } catch (error) {
       setUploadStatus("error");
       setUploadMessage(
@@ -93,62 +98,80 @@ export const TestCaseUpload = () => {
         />
       </div>
 
-      <div className="form-group">
-        <label className="input-label">Test Type</label>
-        <div className="radio-group">
-          {["input", "output"].map((type) => (
-            <label key={type} className="radio-label">
+      <div className="file-upload-sections">
+        <div className="form-group">
+          <label className="input-label">Input File</label>
+          <div
+            className={`drag-drop-zone ${inputDragActive ? "active" : ""}`}
+            onDragEnter={(e) => handleDrag(e, setInputDragActive)}
+            onDragLeave={(e) => handleDrag(e, setInputDragActive)}
+            onDragOver={(e) => handleDrag(e, setInputDragActive)}
+            onDrop={(e) => handleDrop(e, setInputDragActive, setInputFile)}
+          >
+            <FaCloudUploadAlt className="upload-icon" />
+            <p>Drag and drop input file here</p>
+            <span>OR </span>
+            <br />
+            <label className="browse-button">
+              Browse Files
               <input
-                type="radio"
-                value={type}
-                checked={testType === type}
-                onChange={(e) => setTestType(e.target.value as any)}
-                className="radio-input"
+                type="file"
+                ref={inputFileRef}
+                onChange={(e) => setInputFile(e.target.files?.[0] || null)}
+                hidden
                 disabled={isUploading}
               />
-              <span className="radio-custom"></span>
-              {type.charAt(0).toUpperCase() + type.slice(1)}
             </label>
-          ))}
+          </div>
+          {inputFile && (
+            <div className="file-preview">
+              <span className="file-name">{inputFile.name}</span>
+              <span className="file-size">
+                {(inputFile.size / 1024).toFixed(2)} KB
+              </span>
+            </div>
+          )}
+        </div>
+
+        <div className="form-group">
+          <label className="input-label">Output File</label>
+          <div
+            className={`drag-drop-zone ${outputDragActive ? "active" : ""}`}
+            onDragEnter={(e) => handleDrag(e, setOutputDragActive)}
+            onDragLeave={(e) => handleDrag(e, setOutputDragActive)}
+            onDragOver={(e) => handleDrag(e, setOutputDragActive)}
+            onDrop={(e) => handleDrop(e, setOutputDragActive, setOutputFile)}
+          >
+            <FaCloudUploadAlt className="upload-icon" />
+            <p>Drag and drop output file here</p>
+            <span>OR </span>
+            <br />
+            <label className="browse-button">
+              Browse Files
+              <input
+                type="file"
+                ref={outputFileRef}
+                onChange={(e) => setOutputFile(e.target.files?.[0] || null)}
+                hidden
+                disabled={isUploading}
+              />
+            </label>
+          </div>
+          {outputFile && (
+            <div className="file-preview">
+              <span className="file-name">{outputFile.name}</span>
+              <span className="file-size">
+                {(outputFile.size / 1024).toFixed(2)} KB
+              </span>
+            </div>
+          )}
         </div>
       </div>
-
-      <div
-        className={`drag-drop-zone ${dragActive ? "active" : ""}`}
-        onDragEnter={handleDrag}
-        onDragLeave={handleDrag}
-        onDragOver={handleDrag}
-        onDrop={handleDrop}
-      >
-        <FaCloudUploadAlt className="upload-icon" />
-        <p>Drag and drop test case file here</p>
-        <span>OR </span>
-        <br />
-        <label className="browse-button">
-          Browse Files
-          <input
-            type="file"
-            ref={fileInput}
-            onChange={(e) => setSelectedFile(e.target.files?.[0] || null)}
-            hidden
-            disabled={isUploading}
-          />
-        </label>
-      </div>
-
-      {selectedFile && (
-        <div className="file-preview">
-          <span className="file-name">{selectedFile.name}</span>
-          <span className="file-size">
-            {(selectedFile.size / 1024).toFixed(2)} KB
-          </span>
-        </div>
-      )}
 
       <button
         onClick={handleUpload}
         className="upload-button"
-        disabled={!selectedFile || !questionId || isUploading}
+        disabled={!inputFile || !outputFile || !questionId || isUploading}
       >
         {isUploading ? (
           <>

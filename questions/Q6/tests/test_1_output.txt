@@ -1,5 +1,0 @@
-Basis vectors for the column space:
-[1.0, 0.0, 0.0]
-[0.0, 1.0, 0.0]
-[0.0, 0.0, 1.0]
-Dimension of the column space: 3

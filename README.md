@@ -101,3 +101,11 @@ Each question folder must contain a config.json file with the following fields:
   "weight": 1.5               // Scoring weight for this question
 }
 ```
+
+**TO-DO**
+
+1. In the Test Result section, show the table properly, Instead of Script Column, Take the [1] position of the script file names (2 srn).
+
+2. Allow to download the displayed result as csv.
+
+3. Allow option to upload multiple scripts at once in upload script tab.

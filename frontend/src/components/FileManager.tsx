@@ -5,7 +5,10 @@ import { FileList } from "../types";
 import "./FileManager.css";
 
 export const FileManager = () => {
-  const [files, setFiles] = useState<FileList>({ scripts: [], questions: [] });
+  const [files, setFiles] = useState<FileList>({
+    scripts: [],
+    questions: {}, // Initialize as empty object instead of array
+  });
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -70,29 +73,44 @@ export const FileManager = () => {
               <thead>
                 <tr>
                   <th>Question ID</th>
+                  <th>Test Case Name</th>
                   <th>Actions</th>
                 </tr>
               </thead>
               <tbody>
-                {files.questions.map((question) => (
-                  <tr key={question}>
-                    <td>{question}</td>
-                    <td>
-                      <button
-                        onClick={() =>
-                          handleDelete(`questions/${question}`, "testcase")
-                        }
-                        className="delete-btn"
-                      >
-                        <FaTrash />
-                        <span>Delete</span>
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-                {files.questions.length === 0 && (
+                {Object.entries(files.questions).map(
+                  ([questionId, testCases]) =>
+                    testCases.length > 0 ? (
+                      testCases.map((testCase) => (
+                        <tr key={`${questionId}-${testCase}`}>
+                          <td>{questionId}</td>
+                          <td>{testCase}</td>
+                          <td>
+                            <button
+                              onClick={() =>
+                                handleDelete(
+                                  `questions/${questionId}/tests/${testCase}`,
+                                  "testcase"
+                                )
+                              }
+                              className="delete-btn"
+                            >
+                              <FaTrash />
+                              <span>Delete</span>
+                            </button>
+                          </td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr key={questionId}>
+                        <td>{questionId}</td>
+                        <td colSpan={2}>No test cases found</td>
+                      </tr>
+                    )
+                )}
+                {Object.keys(files.questions).length === 0 && (
                   <tr className="empty-row">
-                    <td colSpan={2}>No test cases found</td>
+                    <td colSpan={3}>No questions found</td>
                   </tr>
                 )}
               </tbody>
