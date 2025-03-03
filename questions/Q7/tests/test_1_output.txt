@@ -1,0 +1,5 @@
+The matrix is not singular.
+Inverse of the matrix: 
+[[-24.  18.   5.]
+ [ 20. -15.  -4.]
+ [ -5.   4.   1.]]

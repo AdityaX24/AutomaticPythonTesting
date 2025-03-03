@@ -67,7 +67,7 @@ root
 5. **In a new terminal go to backend directory**:
    ```bash
    cd backend
-   uvicorn main:app --reload --port 8000
+   uvicorn app:app --reload --port 8000
    ```
 
 **Usage**
