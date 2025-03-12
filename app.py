@@ -11,6 +11,7 @@ import json
 import xlsxwriter
 import io
 import csv
+import time
 
 logger = logging.getLogger("my_logger")
 
@@ -26,16 +27,53 @@ app.add_middleware(
 )
 
 BASE_DIR = Path(__file__).parent.parent
-
 @app.post("/upload/script")
-async def upload_script(file: UploadFile = File(...)):
+async def upload_script(files: list[UploadFile] = File(...)):
     script_dir = BASE_DIR / "AutomaticPythonTesting" / "scripts"
     script_dir.mkdir(exist_ok=True)
     
-    file_path = script_dir / file.filename
-    with open(file_path, "wb") as buffer:
-        shutil.copyfileobj(file.file, buffer)
-    return {"message": f"Script {file.filename} uploaded"}
+    results = []
+    total_files = len(files)
+    uploaded_count = 0
+
+    for file in files:
+        try:
+            # Validate Python file extension
+            if not file.filename.lower().endswith('.py'):
+                results.append({
+                    "filename": file.filename,
+                    "status": "rejected",
+                    "message": "Only Python files (.py) are allowed"
+                })
+                continue
+
+            # Sanitize filename and maintain original name
+            clean_name = Path(file.filename).name  # Prevent path traversal
+            dest_path = script_dir / clean_name
+            
+            # Save file (will overwrite if exists)
+            with open(dest_path, "wb") as buffer:
+                shutil.copyfileobj(file.file, buffer)
+                
+            uploaded_count += 1
+            results.append({
+                "filename": file.filename,
+                "saved_as": clean_name,  # Always original name
+                "status": "success",
+                "message": "File uploaded successfully"
+            })
+
+        except Exception as e:
+            results.append({
+                "filename": file.filename,
+                "status": "error",
+                "message": f"Upload failed: {str(e)}"
+            })
+
+    return {
+        "processed": f"{uploaded_count}/{total_files} files uploaded",
+        "details": results
+    }
 
 @app.post("/upload/testcase")
 async def upload_testcase(

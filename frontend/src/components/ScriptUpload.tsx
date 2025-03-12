@@ -1,64 +1,103 @@
 import { useRef, useState } from "react";
-import { FaCloudUploadAlt, FaSpinner } from "react-icons/fa";
+import {
+  FaCloudUploadAlt,
+  FaSpinner,
+  FaTimes,
+  FaCheckCircle,
+  FaExclamationTriangle,
+} from "react-icons/fa";
 import { uploadScript } from "../api";
 import "./ScriptUpload.css";
+
+interface UploadResult {
+  filename: string;
+  saved_as?: string;
+  status: "success" | "error" | "rejected";
+  message: string;
+}
 
 export const ScriptUpload = () => {
   const fileInput = useRef<HTMLInputElement>(null);
   const [dragActive, setDragActive] = useState(false);
-  const [uploadStatus, setUploadStatus] = useState<
-    "idle" | "success" | "error"
-  >("idle");
-  const [uploadMessage, setUploadMessage] = useState("");
+  const [uploadResults, setUploadResults] = useState<UploadResult[]>([]);
   const [isUploading, setIsUploading] = useState(false);
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
 
   const handleDrag = (e: React.DragEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    if (e.type === "dragenter" || e.type === "dragover") {
-      setDragActive(true);
-    } else if (e.type === "dragleave") {
-      setDragActive(false);
-    }
+    setDragActive(e.type === "dragenter" || e.type === "dragover");
   };
 
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
     e.stopPropagation();
     setDragActive(false);
-    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-      setSelectedFile(e.dataTransfer.files[0]);
-      if (fileInput.current) {
-        fileInput.current.files = e.dataTransfer.files;
-      }
+    if (e.dataTransfer.files?.length) {
+      const newFiles = Array.from(e.dataTransfer.files);
+      setSelectedFiles((prev) => [
+        ...prev,
+        ...newFiles.filter((f) => !prev.some((pf) => pf.name === f.name)),
+      ]);
     }
   };
 
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files?.length) {
+      const newFiles = Array.from(e.target.files);
+      setSelectedFiles((prev) => [
+        ...prev,
+        ...newFiles.filter((f) => !prev.some((pf) => pf.name === f.name)),
+      ]);
+    }
+  };
+
+  const removeFile = (index: number) => {
+    setSelectedFiles((prev) => prev.filter((_, i) => i !== index));
+  };
+
   const handleUpload = async () => {
-    if (!fileInput.current?.files?.[0]) return;
+    if (!selectedFiles.length) return;
 
     setIsUploading(true);
-    setUploadStatus("idle");
-    setUploadMessage("");
+    setUploadResults([]);
 
     try {
       const formData = new FormData();
-      formData.append("file", fileInput.current.files[0]);
-      formData.append("type", "script");
+      selectedFiles.forEach((file) => {
+        formData.append("files", file);
+      });
 
-      await uploadScript(formData);
-      setUploadStatus("success");
-      setUploadMessage("File uploaded successfully!");
-      setSelectedFile(null);
-      if (fileInput.current) fileInput.current.value = "";
-      setTimeout(() => setUploadStatus("idle"), 3000);
+      const response = await uploadScript(formData);
+      setUploadResults(response.details);
+
+      if (response.details.some((r: UploadResult) => r.status === "success")) {
+        setSelectedFiles([]);
+        if (fileInput.current) fileInput.current.value = "";
+      }
     } catch (error) {
-      setUploadStatus("error");
-      setUploadMessage("Upload failed. Please try again.");
+      setUploadResults([
+        {
+          filename: "All files",
+          status: "error",
+          message: "Upload failed. Please try again.",
+        },
+      ]);
     } finally {
       setIsUploading(false);
-      setTimeout(() => setUploadStatus("idle"), 3000);
+    }
+  };
+
+  const getStatusIcon = (status: string) => {
+    switch (status) {
+      case "success":
+        return <FaCheckCircle className="success" />;
+      case "error":
+        return <FaExclamationTriangle className="error" />;
+      case "rejected":
+        return <FaExclamationTriangle className="warning" />;
+      default:
+        return null;
     }
   };
 
@@ -72,7 +111,7 @@ export const ScriptUpload = () => {
         onDrop={handleDrop}
       >
         <FaCloudUploadAlt className="upload-icon" />
-        <p>Drag and drop your script here.</p>
+        <p>Drag and drop Python scripts here</p>
         <span>OR </span>
         <br />
         <label className="browse-button">
@@ -80,38 +119,73 @@ export const ScriptUpload = () => {
           <input
             type="file"
             ref={fileInput}
-            onChange={(e) => setSelectedFile(e.target.files?.[0] || null)}
+            onChange={handleFileSelect}
             hidden
+            multiple
+            accept=".py"
           />
         </label>
+        <small className="file-requirements">
+          Only .py files allowed • Max 10 files at once
+        </small>
       </div>
 
-      {selectedFile && (
-        <div className="file-preview">
-          <span className="file-name">{selectedFile.name}</span>
-          <span className="file-size">
-            {(selectedFile.size / 1024).toFixed(2)} KB
-          </span>
+      {selectedFiles.length > 0 && (
+        <div className="files-preview">
+          {selectedFiles.map((file, index) => (
+            <div key={index} className="file-preview">
+              <div className="file-info">
+                <span className="file-name">{file.name}</span>
+                <span className="file-size">
+                  {(file.size / 1024).toFixed(2)} KB
+                </span>
+              </div>
+              <button
+                className="remove-file"
+                onClick={() => removeFile(index)}
+                title="Remove file"
+                disabled={isUploading}
+              >
+                <FaTimes />
+              </button>
+            </div>
+          ))}
         </div>
       )}
 
       <button
         onClick={handleUpload}
         className="upload-button"
-        disabled={!selectedFile || isUploading}
+        disabled={selectedFiles.length === 0 || isUploading}
       >
         {isUploading ? (
           <>
             <FaSpinner className="spin" />
-            Uploading...
+            Uploading {selectedFiles.length} File
+            {selectedFiles.length !== 1 ? "s" : ""}...
           </>
         ) : (
-          "Upload Script"
+          `Upload ${selectedFiles.length} File${
+            selectedFiles.length !== 1 ? "s" : ""
+          }`
         )}
       </button>
 
-      {uploadStatus !== "idle" && (
-        <div className={`status-message ${uploadStatus}`}>{uploadMessage}</div>
+      {uploadResults.length > 0 && (
+        <div className="upload-results">
+          {uploadResults.map((result, index) => (
+            <div key={index} className={`result-message ${result.status}`}>
+              {getStatusIcon(result.status)}
+              <div className="result-details">
+                <strong>{result.filename}</strong>
+                <span>{result.message}</span>
+                {result.saved_as && result.saved_as !== result.filename && (
+                  <small>Saved as: {result.saved_as}</small>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
       )}
     </div>
   );
