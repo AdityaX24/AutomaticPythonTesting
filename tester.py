@@ -5,8 +5,33 @@ from PIL import Image  # For image comparisons
 import numpy as np
 import sys
 from pathlib import Path
+import logging
+from datetime import datetime
 
 BASE_DIR = Path(__file__).parent.parent
+
+LOG_DIR = BASE_DIR / "AutomaticPythonTesting" / "logs"
+LOG_DIR.mkdir(parents=True, exist_ok=True)
+
+def setup_logger():
+    """Configure logging system"""
+    logger = logging.getLogger("PythonTestLogger")
+    logger.setLevel(logging.INFO)
+
+    # Create file handler which logs even debug messages
+    log_file = LOG_DIR / f"test_log_{datetime.now().strftime('%Y%m%d_%H%M%S')}.log"
+    file_handler = logging.FileHandler(log_file)
+    file_handler.setLevel(logging.INFO)
+
+    # Create formatter and add it to the handlers
+    formatter = logging.Formatter(
+        '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    )
+    file_handler.setFormatter(formatter)
+
+    # Add the handlers to the logger
+    logger.addHandler(file_handler)
+    return logger
 
 def load_questions(questions_dir):
     """Load all questions with their configurations and test cases"""
@@ -121,6 +146,7 @@ def compare_outputs(actual, expected, comparison_type):
     return False
 
 def main():
+    logger = setup_logger()
     questions = load_questions('questions')
     scripts_path = BASE_DIR / "AutomaticPythonTesting" / 'scripts'
     scripts = [f for f in os.listdir(scripts_path) if f.endswith('.py')]
@@ -157,6 +183,23 @@ def main():
                     'status': 'Failed',
                     'error': execution['error']
                 })
+                logger.error(
+        f"""Test failed for {script_name} on {q_name}
+
+SRNs: {srn1}/{srn2}
+
+Error:
+{execution['error']}
+
+Test Type: {test['type']}
+
+Test Input:
+{test.get('input', test.get('args', 'No input'))}
+
+Expected Output:
+{test['expected']}
+--------------------------------------------------"""
+    )
                 continue
                 
             is_passed = compare_outputs(
@@ -174,6 +217,23 @@ def main():
                     'expected': test['expected'],
                     'actual': execution['output']
                 })
+                logger.error(
+        f"""Test failed for {script_name} on {q_name}
+
+SRNs: {srn1}/{srn2}
+
+Test Type: {test['type']}
+
+Test Input:
+{test.get('input', test.get('args', 'No input'))}
+
+Expected Output:
+{test['expected']}
+
+Actual Output:
+{execution['output']}
+--------------------------------------------------"""
+    )
         
         score = (passed / len(q_tests)) * q_config['weight']
         results.append({
