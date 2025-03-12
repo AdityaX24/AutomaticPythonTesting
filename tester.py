@@ -122,21 +122,22 @@ def compare_outputs(actual, expected, comparison_type):
 
 def main():
     questions = load_questions('questions')
-
     scripts_path = BASE_DIR / "AutomaticPythonTesting" / 'scripts'
     scripts = [f for f in os.listdir(scripts_path) if f.endswith('.py')]
-    
-    print(questions)
     results = []
     
     for script in scripts:
         script_name = os.path.basename(script)
-        print(script_name)
-        q_name = script_name.split('_')[0]  # Extract Q1 from Q1_script.py
-        
-        if q_name not in questions:
+        # Extract Qn, SRN1, SRN2 from filename
+        script_base = script_name.rsplit('.', 1)[0]
+        parts = script_base.split('_')
+        if len(parts) != 3:
+            print(f"Skipping {script_name}: invalid filename format")
             continue
-            
+        q_name, srn1, srn2 = parts
+        if q_name not in questions:
+            print(f"Skipping {script_name}: question {q_name} not found")
+            continue
         q_config = questions[q_name]['config']
         q_tests = questions[q_name]['tests']
         
@@ -177,18 +178,31 @@ def main():
         score = (passed / len(q_tests)) * q_config['weight']
         results.append({
             'question': q_name,
-            'script': script_name,
-            'score': score,
+            'script': script_name, 
+            'srn1': srn1,
+            'srn2': srn2,
+            'score': score, 
             'details': test_results
         })
 
         print(results)
     # Save results and generate report
     with open('results.csv', 'w') as f:
-        f.write('Question,Script,Test,Status,Score\n')
+        f.write('Question,Script_Name,SRN_1,SRN_2,PassedTests,TotalTests,Score\n')
         for res in results:
-            for i, detail in enumerate(res['details']):
-                f.write(f"{res['question']},{res['script']},Test_{i+1},{detail['status']},{res['score']}\n")
+            # Calculate passed tests count from details
+            passed_count = sum(1 for detail in res['details'] if detail['status'] == 'Passed')
+            total_tests = len(res['details'])
+            
+            f.write(f"{res['question']},")
+            f.write(f"{res['script']},")
+            f.write(f"{res['srn1']},")
+            f.write(f"{res['srn2']},")
+            f.write(f"{passed_count},")
+            f.write(f"{total_tests},")
+            f.write(f"{res['score']:.2f}\n")
+
+    
 
 if __name__ == '__main__':
     main()

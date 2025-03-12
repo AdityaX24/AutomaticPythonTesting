@@ -1,2 +1,2 @@
-Question,Script,Test,Status,Score
-Q1,Q1_Aditya_script.py,Test_1,Passed,100.0
+Question,Script_Name,SRN_1,SRN_2,PassedTests,TotalTests,Score
+Q1,Q1_SRN111_SRN222.py,SRN111,SRN222,1,1,100.00

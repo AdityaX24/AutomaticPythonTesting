@@ -1,18 +1,14 @@
 import React from "react";
-import {
-  FaClipboardCheck,
-  FaTimesCircle,
-  FaQuestionCircle,
-  FaFileCode,
-  FaChartBar,
-} from "react-icons/fa";
+import { FaClipboardCheck, FaChartBar, FaFileExcel } from "react-icons/fa";
 import "./ResultsDisplay.css";
 
 interface Result {
   Question: string;
-  Script: string;
-  Test: string;
-  Status: "Passed" | "Failed" | "Pending";
+  Script_Name: string;
+  SRN_1: string;
+  SRN_2: string;
+  PassedTests: number;
+  TotalTests: number;
   Score: number;
 }
 
@@ -21,71 +17,73 @@ interface ResultsDisplayProps {
 }
 
 export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ results }) => {
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case "Passed":
-        return <FaClipboardCheck className="status-icon pass" />;
-      case "Failed":
-        return <FaTimesCircle className="status-icon fail" />;
-      default:
-        return <FaQuestionCircle className="status-icon pending" />;
+  const handleDownloadExcel = async () => {
+    try {
+      const response = await fetch("http://localhost:8000/download-excel");
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `test_results_${new Date().toISOString().slice(0, 10)}.xlsx`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error("Download failed:", error);
     }
   };
 
   return (
     <div className="results-card">
       <div className="card-header">
-        <FaChartBar className="header-icon" />
-        Test Results
-        <span className="last-updated">
-          Last updated: {new Date().toLocaleTimeString()}
-        </span>
+        <div className="header-left">
+          <FaChartBar className="header-icon" />
+          Test Results ({results.length} submissions)
+        </div>
+        <div className="header-right">
+          <button onClick={handleDownloadExcel} className="download-button">
+            <FaFileExcel className="download-icon" />
+            Download Excel
+          </button>
+          <span className="last-updated">
+            Last updated: {new Date().toLocaleTimeString()}
+          </span>
+        </div>
       </div>
 
       <div className="card-body">
         {results.length > 0 ? (
-          <div className="table-responsive">
+          <div className="table-container">
             <table className="results-table">
               <thead>
                 <tr>
-                  <th className="question-col">
-                    <FaQuestionCircle className="column-icon" />
-                    Question
-                  </th>
-                  <th className="script-col">
-                    <FaFileCode className="column-icon" />
-                    Script
-                  </th>
-                  <th className="test-col">
-                    <FaFileCode className="column-icon" />
-                    Test
-                  </th>
-                  <th className="status-col">Status</th>
-                  <th className="score-col">Score</th>
+                  <th>Question</th>
+                  <th>Script Name</th>
+                  <th>SRN 1</th>
+                  <th>SRN 2</th>
+                  <th>Passed</th>
+                  <th>Total</th>
+                  <th>Score</th>
                 </tr>
               </thead>
               <tbody>
                 {results.map((result, index) => (
-                  <tr key={index} className="result-row">
+                  <tr key={index}>
                     <td>{result.Question}</td>
-                    <td>{result.Script}</td>
-                    <td>{result.Test}</td>
+                    <td>{result.Script_Name}</td>
+                    <td>{result.SRN_1}</td>
+                    <td>{result.SRN_2}</td>
+                    <td>{result.PassedTests}</td>
+                    <td>{result.TotalTests}</td>
                     <td>
-                      <div className="status-container">
-                        {getStatusIcon(result.Status)}
-                        <span
-                          className={`status-text ${result.Status.toLowerCase()}`}
-                        >
-                          {result.Status}
-                        </span>
-                      </div>
-                    </td>
-                    <td>
-                      <div className="score-container">
-                        <span className="score-value">{result.Score}%</span>
-                        <div className="score-bar">
+                      <div className="score-display">
+                        <div className="score-text">
+                          {result.Score.toFixed(2)}%
+                        </div>
+                        <div className="score-bar-container">
                           <div
-                            className="score-progress"
+                            className="score-bar-fill"
                             style={{ width: `${result.Score}%` }}
                           ></div>
                         </div>

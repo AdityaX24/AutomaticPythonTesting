@@ -12,9 +12,11 @@ import "./TestControls.css";
 
 interface TestResult {
   Question: string;
-  Script: string;
-  Test: string;
-  Status: "Passed" | "Failed" | "Pending";
+  Script_Name: string;
+  SRN_1: string;
+  SRN_2: string;
+  PassedTests: number;
+  TotalTests: number;
   Score: number;
 }
 
@@ -60,19 +62,27 @@ export const TestControls = () => {
 
       return lines.slice(1).map((line) => {
         const values = line.split(",").map((v) => v.trim());
-        return headers.reduce(
-          (acc, header, index) => ({
-            ...acc,
-            [header]:
-              header === "Score" ? parseInt(values[index], 10) : values[index],
-          }),
-          {} as TestResult
-        );
+        return headers.reduce((acc, header, index) => {
+          const value = values[index];
+          switch (header) {
+            case "PassedTests":
+            case "TotalTests":
+              return { ...acc, [header]: parseInt(value, 10) };
+            case "Score":
+              return { ...acc, [header]: parseFloat(value) };
+            default:
+              return { ...acc, [header]: value };
+          }
+        }, {} as TestResult);
       });
     } catch (error) {
       throw new Error("Failed to parse test results");
     }
   };
+
+  const totalPassedScripts = results.filter(
+    (r) => r.PassedTests === r.TotalTests
+  ).length;
 
   return (
     <div className="test-controls-container">
@@ -119,8 +129,7 @@ export const TestControls = () => {
       {results.length > 0 && !isLoading && (
         <div className="success-message">
           <FaRegCheckCircle />
-          {results.filter((r) => r.Status === "Passed").length}/{results.length}{" "}
-          tests passed
+          {totalPassedScripts}/{results.length} scripts passed all tests
         </div>
       )}
 

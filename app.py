@@ -1,6 +1,6 @@
 from fastapi import FastAPI, UploadFile, File, Form, HTTPException, Body, BackgroundTasks
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, StreamingResponse
 import os
 import shutil
 import subprocess
@@ -8,6 +8,9 @@ from typing import List
 from pathlib import Path
 import logging
 import json
+import xlsxwriter
+import io
+import csv
 
 logger = logging.getLogger("my_logger")
 
@@ -169,3 +172,49 @@ async def list_files():
         "scripts": scripts,
         "questions": questions  # Now returns {question_id: [test_files]}
     }
+
+
+@app.get("/download-excel")
+async def download_excel():
+    csv_path = BASE_DIR / "AutomaticPythonTesting" / "results.csv"
+    
+    if not csv_path.exists():
+        raise HTTPException(status_code=404, detail="Results file not found")
+
+    # Create in-memory Excel file
+    output = io.BytesIO()
+    workbook = xlsxwriter.Workbook(output)
+    worksheet = workbook.add_worksheet()
+
+    # Read CSV and write to Excel
+    with open(csv_path, 'r') as f:
+        reader = csv.reader(f)
+        headers = next(reader)
+        
+        # Write headers with formatting
+        header_format = workbook.add_format({'bold': True, 'bg_color': '#FFFFFF'})
+        for col_num, header in enumerate(headers):
+            worksheet.write(0, col_num, header, header_format)
+
+        # Write data rows
+        for row_num, row in enumerate(reader, start=1):
+            for col_num, value in enumerate(row):
+                # Convert numeric values
+                try:
+                    value = float(value) if '.' in value else int(value)
+                except ValueError:
+                    pass
+                worksheet.write(row_num, col_num, value)
+
+    workbook.close()
+    output.seek(0)
+
+    # Return as streaming response
+    headers = {
+        'Content-Disposition': 'attachment; filename="test_results.xlsx"'
+    }
+    return StreamingResponse(
+        output,
+        media_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        headers=headers
+    )
