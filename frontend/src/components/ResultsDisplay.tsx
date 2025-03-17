@@ -79,12 +79,24 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ results }) => {
                     <td>
                       <div className="score-display">
                         <div className="score-text">
-                          {result.Score.toFixed(2)}%
+                          {result.TotalTests === 0
+                            ? "0.00%"
+                            : `${(
+                                (result.PassedTests / result.TotalTests) *
+                                100
+                              ).toFixed(2)}%`}
                         </div>
                         <div className="score-bar-container">
                           <div
                             className="score-bar-fill"
-                            style={{ width: `${result.Score}%` }}
+                            style={{
+                              width: `${
+                                result.TotalTests === 0
+                                  ? 0
+                                  : (result.PassedTests / result.TotalTests) *
+                                    100
+                              }%`,
+                            }}
                           ></div>
                         </div>
                       </div>

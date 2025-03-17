@@ -93,6 +93,8 @@ def decompose_and_solve(A, b):
     # Return permutation matrix P, lower triangular L, upper triangular U, and solution x  
     
     #Implement your code here
+    P, L, U = scipy.linalg.lu(A)
+    x = np.linalg.solve(A, b)
 
     return P, L, U, x  
 
