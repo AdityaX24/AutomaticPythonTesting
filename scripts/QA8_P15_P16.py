@@ -1,43 +1,61 @@
-#3
+#4
 import numpy as np
 from sympy import Matrix
 
-def analyze_traffic(A):
+def secure_communication(T, M):
     """
-    Analyze traffic flow by computing RREF and Rank-Nullity.
+    Perform secure message decoding using matrix inversion.
 
     Args:
-        A (numpy.ndarray): Traffic flow matrix of size m x n.
+        T (numpy.ndarray): Encoding matrix of size n x n.
+        M (numpy.ndarray): Encoded message matrix.
 
     Returns:
-        tuple: (RREF, rank, nullity) where:
-               RREF is the row-reduced echelon form of A.
-               rank is the rank of A.
-               nullity is the nullity of A.
+        tuple: (C, RREF, rank, nullity) where:
+               C is the decoded message.
+               RREF is the row-reduced echelon form of T.
+               rank is the rank of T.
+               nullity is the nullity of T.
     """
-    A_sympy = Matrix(A)
-    rref_matrix, pivot_columns = A_sympy.rref()  # Compute RREF using SymPy
-    rank = len(pivot_columns)
-    nullity = A.shape[1] - rank  # Nullity = Columns - Rank
+    # Compute inverse and decode message
+    T_inv = np.linalg.inv(T)
+    C = np.dot(T_inv, M)
 
-    return np.array(rref_matrix.tolist()), rank, nullity
+    # Compute RREF using SymPy
+    T_sympy = Matrix(T)
+    T_rref, _ = T_sympy.rref()
+
+    # Compute Rank and Nullity
+    rank = np.linalg.matrix_rank(T)
+    nullity = T.shape[1] - rank  # Nullity = Columns - Rank
+
+    return C, np.array(T_rref.tolist()), rank, nullity
 
 # Boilerplate code to handle input and output
 def main():
     # Read input from stdin (HackerRank format)
-    A = []
-    rows, cols = map(int, input().split())  # Read dimensions of A
+    T, M = [], []
+    rows, cols = map(int, input().split())  # Read dimensions of T
 
     for _ in range(rows):
-        A.append(list(map(float, input().split())))
+        T.append(list(map(float, input().split())))
 
-    A = np.array(A)
+    rows, cols = map(int, input().split())  # Read dimensions of M
+    for _ in range(rows):
+        M.append(list(map(float, input().split())))
 
-    # Perform Traffic Analysis
-    RREF, rank, nullity = analyze_traffic(A)
+    T = np.array(T)
+    M = np.array(M)
+
+    # Perform Secure Communication Processing
+    C, RREF, rank, nullity = secure_communication(T, M)
 
     # Print results
-    print("RREF =")
+    print("C =")
+    for row in C:
+        print(" ".join(f"{x:.1f}" for x in row))
+
+    print("\nRREF =")
     for row in RREF:
         print(" ".join(f"{x:.1f}" for x in row))
 

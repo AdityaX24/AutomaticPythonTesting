@@ -170,7 +170,7 @@ async def delete_item(data: dict = Body(...)):
 async def run_tests(background_tasks: BackgroundTasks):
        result_file = BASE_DIR / "AutomaticPythonTesting" / "results.csv"
 
-       venv_python = BASE_DIR / "AutomaticPythonTesting" / ".venv" / "bin" / "python3.12"  # Adjust this path as necessary
+       venv_python = BASE_DIR / "AutomaticPythonTesting" / ".venv" / "bin" / "python3.13"  # Adjust this path as necessary
        # Run the tester script and capture output
        try:
            result = subprocess.run(

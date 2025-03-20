@@ -95,7 +95,7 @@ def load_questions(questions_dir):
 
 def run_script(script_path, test_case, config):
     """Run a script with the given test case based on question type"""
-    timeout = config.get('timeout', 5)
+    timeout = config.get('timeout', 10)
     
     try:
         if test_case['type'] == 'stdin':
