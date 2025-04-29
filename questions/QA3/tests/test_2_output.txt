@@ -1,2 +1,0 @@
-Best-fit parameters: [1. 2.]
-Residual error: [0. 0. 0.]

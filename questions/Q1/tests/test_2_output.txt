@@ -1,0 +1,19 @@
+Centered data:
+[[ 0.  0.  0.]
+ [-1. -2. -3.]
+ [ 1.  2.  3.]]
+
+Top directions:
+-0.27 -0.53 -0.80
+
+Reduced data:
+0.00
+3.74
+-3.74
+
+Reconstructed data:
+[[2. 4. 6.]
+ [1. 2. 3.]
+ [3. 6. 9.]]
+
+Reconstruction error: 0.00

@@ -1,0 +1,15 @@
+Transformed Data:
+[[-10.06]
+ [ -4.63]
+ [  0.8 ]
+ [  2.71]
+ [  4.63]
+ [  6.55]]
+Matrix A:
+[[195.05]]
+Vector b:
+[195.05]
+Solution x:
+[1.]
+Residual norm:
+0.00

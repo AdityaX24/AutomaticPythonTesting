@@ -1,0 +1,15 @@
+Centered data:
+[[0. 0.]
+ [0. 0.]
+ [0. 0.]]
+
+Top directions:
+No directions (all features are constant)
+
+Reduced data:
+No reduced data (all features are constant)
+
+Reconstructed data:
+[0. 0.]
+
+Reconstruction error: 8.66
